@@ -1,0 +1,28 @@
+public static string Serialize<T>(T myObject)
+        {
+            using (var stream = new MemoryStream())
+            {
+                XmlWriterSettings settings = new XmlWriterSettings();
+                settings.Encoding = new UTF8Encoding();
+                settings.OmitXmlDeclaration = true;
+                using (var writer = XmlWriter.Create(stream, settings))
+                {
+                    var xns = new XmlSerializerNamespaces();
+                    xns.Add(string.Empty, string.Empty);
+                    new XmlSerializer(typeof(T)).Serialize(writer, myObject, xns);
+                    var xmlEncodedList = Encoding.UTF8.GetString(stream.ToArray());
+                    return xmlEncodedList.ToString();
+                }
+            }
+        }
+
+        public static T Deserialize<T>(string xml)
+        {
+            using (var stream = new MemoryStream(Encoding.UTF8.GetBytes(xml)))
+            {
+                XmlSerializer serializer = new XmlSerializer(typeof(T));
+
+                var modelobject = (T)serializer.Deserialize(stream);
+                return modelobject;
+            }
+        }
